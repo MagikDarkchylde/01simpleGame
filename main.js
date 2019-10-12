@@ -55,7 +55,19 @@ function gameLoop() {
 	y += speedY;
 	//collision
 	let collision1 = stageCollision( { x: x, y: y, width: charWH, height: charWH }, { width: canvas.width, height: canvas.height });
+	if (collision1 !== "") {
+		x += -speedX;
+		y += -speedY;
+		speedX = 0;
+		speedY = 0;
+	}
 	let collision2 = tilesCollision( { x: x, y: y, width: charWH, height: charWH }, tilesArray );
+	if (collision2) {
+		x += -speedX;
+		y += -speedY;
+		speedX = 0;
+		speedY = 0;
+	}
 	//update view
 	drawBG();
 	drawChar();
