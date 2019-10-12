@@ -1,4 +1,5 @@
 import { stageCollision, tilesCollision } from "./lib/collision.js";
+import { player } from "./lib/player.js";
 //capturar tag
 let content = document.getElementById('content');
 content.innerHTML= `<div class="box">Canvas title</div>`;
@@ -13,12 +14,7 @@ canvas.style.background = "#000";
 let ctx = canvas.getContext("2d");
 
 //vars 
-let x = 35;
-let y = 35;
-let speedX = 0;
-let speedY = 0;
-let charWH = 32;
-let playerColor = "#27ae60";
+let char = player(ctx);
 //disenhar bg
 let bgArray2D = [
 [1,1,1,1,1,1,1,1],
@@ -32,17 +28,17 @@ let bgArray2D = [
 
 let array1D = bgArray2D.reduce((a,b) => a.concat(b));
 let tilesArray = array1D.map((element, i) => {
-	let x = (i % 8) * charWH;
-	let y = (Math.floor(i / 8)) * charWH;
-	return {x: x, y: y, width: charWH, height: charWH, value: element};
+	let x = (i % 8) * char.charWH;
+	let y = (Math.floor(i / 8)) * char.charWH;
+	return {x: x, y: y, width: char.charWH, height: char.charWH, value: element};
 });
 drawBG();
 //disenhar Char
-drawChar();
+char.drawChar();
 
 //add listener
-window.addEventListener("keydown", onKeyDown, false);
-window.addEventListener("keyup", onKeyUp, false);
+window.addEventListener("keydown", char.onKeyDown, false);
+window.addEventListener("keyup", char.onKeyUp, false);
 //GameLoop
 gameLoop();
 function gameLoop() {
@@ -51,47 +47,22 @@ function gameLoop() {
 	//clearRect: x,y, width screen, height screen
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	//update player position
-	x += speedX;
-	y += speedY;
+	char.update
 	//collision
-	let collision1 = stageCollision( { x: x, y: y, width: charWH, height: charWH }, { width: canvas.width, height: canvas.height });
+	let collision1 = stageCollision( { x: char.x, y: char.y, width: char.charWH, height: char.charWH }, { width: canvas.width, height: canvas.height });
 	if (collision1 !== "") {
-		x += -speedX;
-		y += -speedY;
-		speedX = 0;
-		speedY = 0;
+		char.stop();
 	}
-	let collision2 = tilesCollision( { x: x, y: y, width: charWH, height: charWH }, tilesArray );
+	let collision2 = tilesCollision( { x: char.x, y: char.y, width: char.charWH, height: char.charWH }, tilesArray );
 	if (collision2) {
-		x += -speedX;
-		y += -speedY;
-		speedX = 0;
-		speedY = 0;
+		char.stop();
 	}
 	//update view
 	drawBG();
-	drawChar();
+	char.drawChar();
 }
 
-function onKeyDown(event) {
-	if (event.keyCode == 68) {
-		speedX = 5;
-		playerColor = "#27ae60";
-	} else if (event.keyCode == 65) {
-		speedX = -5;
-		playerColor = "#27ae60";
-	} else if (event.keyCode == 87){
-		speedY = -5;
-		playerColor = "#27ae60";
-	} else if (event.keyCode == 83) {
-		speedY = 5;
-		playerColor = "#27ae60";
-	}	
-}
-function onKeyUp(event) {
-	speedX = 0;
-	speedY = 0;
-}
+
 function drawBG() {
 
 	array1D.forEach((element, i) => {
@@ -112,12 +83,4 @@ function drawBG() {
 		}
 	})
 }
-function drawChar() {
 
-	//update screen
-	ctx.beginPath();
-	ctx.fillStyle = playerColor;
-	//params: x,y, width, heigth
-	ctx.rect(x, y, charWH, charWH);
-	ctx.fill();
-}
